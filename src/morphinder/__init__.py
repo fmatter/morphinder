@@ -13,6 +13,7 @@ class Morphinder:
         self.cache = {}
         self.failed_cache = set()
         self.lexicon = lexicon
+        print(lexicon[["Form", "Gloss"]])
 
     def retrieve_morph_id(
         self,
@@ -35,7 +36,7 @@ class Morphinder:
         bare_gloss = gloss.strip("=").strip("-")
         candidates = self.lexicon[
             (self.lexicon[form_key].apply(lambda x: obj == x))
-            & (self.lexicon[gloss_key].apply(lambda x: bare_gloss == x))
+            & (self.lexicon[gloss_key].apply(lambda x: bare_gloss in x))
         ]
         if len(candidates) == 1:
             if sense_key:
