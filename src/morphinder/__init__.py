@@ -13,7 +13,6 @@ class Morphinder:
         self.cache = {}
         self.failed_cache = set()
         self.lexicon = lexicon
-        print(lexicon[["Form", "Gloss"]])
 
     def retrieve_morph_id(
         self,
