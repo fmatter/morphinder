@@ -35,7 +35,7 @@ class Morphinder:
         bare_gloss = gloss.strip("=").strip("-")
         candidates = self.lexicon[
             (self.lexicon[form_key].apply(lambda x: obj == x))
-            & (self.lexicon[gloss_key].apply(lambda x: bare_gloss in x))
+            & (self.lexicon[gloss_key].apply(lambda x: bare_gloss == x))
         ]
         if len(candidates) == 1:
             if sense_key:
@@ -50,17 +50,18 @@ class Morphinder:
             else:
                 return candidates.iloc[0][id_key], None
         if len(candidates) > 0:
-            narrow_candidates = candidates[candidates[type_key] == morph_type]
-            if len(narrow_candidates) == 1:
-                if sense_key:
-                    return (
-                        narrow_candidates.iloc[0][id_key],
-                        narrow_candidates.iloc[0][sense_key][
-                            narrow_candidates.iloc[0][gloss_key].index(bare_gloss)
-                        ],
-                    )
-                else:
-                    return narrow_candidates.iloc[0][id_key]
+            if type_key in candidates:
+                narrow_candidates = candidates[candidates[type_key] == morph_type]
+                if len(narrow_candidates) == 1:
+                    if sense_key:
+                        return (
+                            narrow_candidates.iloc[0][id_key],
+                            narrow_candidates.iloc[0][sense_key][
+                                narrow_candidates.iloc[0][gloss_key].index(bare_gloss)
+                            ],
+                        )
+                    else:
+                        return narrow_candidates.iloc[0][id_key]
             log.warning(
                 f"Multiple lexicon entries for {obj} '{gloss}', using the first hit:"
             )
