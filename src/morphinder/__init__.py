@@ -40,7 +40,7 @@ class Morphinder:
         type_key="Type",
         gloss_key="Gloss",
         form_key="Form",
-    ):
+    ):  # pylint: disable=too-many-arguments
         if (obj, gloss) in self.cache:
             return self.cache[(obj, gloss)]
         if (
@@ -62,8 +62,7 @@ class Morphinder:
                     ],
                 )
                 return self.return_values(obj, gloss, morph_id, sense)
-            else:
-                return self.return_values(obj, gloss, candidates.iloc[0][id_key], None)
+            return self.return_values(obj, gloss, candidates.iloc[0][id_key], None)
         if len(candidates) > 0:
             if type_key in candidates:
                 narrow_candidates = candidates[candidates[type_key] == morph_type]
@@ -77,8 +76,7 @@ class Morphinder:
                                 narrow_candidates.iloc[0][gloss_key].index(bare_gloss)
                             ],
                         )
-                    else:
-                        return narrow_candidates.iloc[0][id_key]
+                    return narrow_candidates.iloc[0][id_key]
             if self.complain:
                 log.warning(
                     f"Multiple lexicon entries for {obj} '{gloss}', using the first hit:"
@@ -94,8 +92,7 @@ class Morphinder:
                         candidates.iloc[0][gloss_key].index(bare_gloss)
                     ],
                 )
-            else:
-                return self.return_values(obj, gloss, candidates.iloc[0][id_key], None)
+            return self.return_values(obj, gloss, candidates.iloc[0][id_key], None)
         if self.complain:
             log.warning(f"No hits for /{obj}/ '{gloss}' in lexicon!")
         self.failed_cache.add((obj, gloss))
