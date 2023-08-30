@@ -1,6 +1,7 @@
 """Top-level package for morphinder."""
 import logging
 
+
 log = logging.getLogger(__name__)
 
 __author__ = "Florian Matter"
@@ -16,6 +17,7 @@ def identify_complex_stem_position(obj, stem):
         if st in objs:
             indices.append(objs.index(st))
     return indices
+
 
 class Morphinder:
     def __init__(self, lexicon, complain=True):
@@ -79,8 +81,8 @@ class Morphinder:
                         return narrow_candidates.iloc[0][id_key]
             if self.complain:
                 log.warning(
-                f"Multiple lexicon entries for {obj} '{gloss}', using the first hit:"
-            )
+                    f"Multiple lexicon entries for {obj} '{gloss}', using the first hit:"
+                )
                 print(morph_type)
                 print(candidates)
             if sense_key:
