@@ -8,11 +8,25 @@ __email__ = "fmatter@mailbox.org"
 __version__ = "0.0.2.dev"
 
 
+def identify_complex_stem_position(obj, stem):
+    indices = []
+    objs = obj.split("-")
+    stems = stem.split("-")
+    for st in stems:
+        if st in objs:
+            indices.append(objs.index(st))
+    return indices
+
 class Morphinder:
-    def __init__(self, lexicon):
+    def __init__(self, lexicon, complain=True):
         self.cache = {}
         self.failed_cache = set()
         self.lexicon = lexicon
+        self.complain = complain
+
+    def return_values(self, obj, gloss, morph_id, sense):
+        self.cache[(obj, gloss)] = (morph_id, sense)
+        return (morph_id, sense)
 
     def retrieve_morph_id(
         self,
@@ -45,16 +59,17 @@ class Morphinder:
                         candidates.iloc[0][gloss_key].index(bare_gloss)
                     ],
                 )
-                self.cache[(obj, gloss)] = (morph_id, sense)
-                return (morph_id, sense)
+                return self.return_values(obj, gloss, morph_id, sense)
             else:
-                return candidates.iloc[0][id_key], None
+                return self.return_values(obj, gloss, candidates.iloc[0][id_key], None)
         if len(candidates) > 0:
             if type_key in candidates:
                 narrow_candidates = candidates[candidates[type_key] == morph_type]
                 if len(narrow_candidates) == 1:
                     if sense_key:
-                        return (
+                        return self.return_values(
+                            obj,
+                            gloss,
                             narrow_candidates.iloc[0][id_key],
                             narrow_candidates.iloc[0][sense_key][
                                 narrow_candidates.iloc[0][gloss_key].index(bare_gloss)
@@ -62,20 +77,24 @@ class Morphinder:
                         )
                     else:
                         return narrow_candidates.iloc[0][id_key]
-            log.warning(
+            if self.complain:
+                log.warning(
                 f"Multiple lexicon entries for {obj} '{gloss}', using the first hit:"
             )
-            print(morph_type)
-            print(candidates)
+                print(morph_type)
+                print(candidates)
             if sense_key:
-                return (
+                return self.return_values(
+                    obj,
+                    gloss,
                     candidates.iloc[0][id_key],
                     candidates.iloc[0][sense_key][
                         candidates.iloc[0][gloss_key].index(bare_gloss)
                     ],
                 )
             else:
-                return candidates.iloc[0][id_key], None
-        log.warning(f"No hits for /{obj}/ '{gloss}' in lexicon!")
+                return self.return_values(obj, gloss, candidates.iloc[0][id_key], None)
+        if self.complain:
+            log.warning(f"No hits for /{obj}/ '{gloss}' in lexicon!")
         self.failed_cache.add((obj, gloss))
         return None, None
